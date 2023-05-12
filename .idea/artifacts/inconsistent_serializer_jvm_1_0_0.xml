@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="inconsistent-serializer-jvm-1.0.0">
+    <output-path>$PROJECT_DIR$/kotlinx-serialization/inconsistent-serializer/build/libs</output-path>
+    <root id="archive" name="inconsistent-serializer-jvm-1.0.0.jar">
+      <element id="module-output" name="KotlinMRE.kotlinx-serialization.inconsistent-serializer.jvmMain" />
+    </root>
+  </artifact>
+</component>
