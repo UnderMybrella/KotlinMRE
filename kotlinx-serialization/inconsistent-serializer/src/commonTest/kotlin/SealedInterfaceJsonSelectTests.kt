@@ -174,6 +174,16 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
     }
 
     context("SimpleNamedCompanion") {
+        test("reified") {
+            val simple = shouldSerialise { serializersModule.serializer<SimpleNamedCompanion>() }
+                .shouldNotBeNull()
+
+            shouldSerialise { decodeFromString(simple, "\"Hello, World!\"") }
+                .shouldNotBeNull()
+                .shouldBeTypeOf<SimpleNamedCompanion>()
+                .string shouldBe "Hello, World!"
+        }
+
         test("explicit") {
             val simple = shouldSerialise { serializersModule.serializer(typeOf<SimpleNamedCompanion>()) }
                 .shouldNotBeNull()

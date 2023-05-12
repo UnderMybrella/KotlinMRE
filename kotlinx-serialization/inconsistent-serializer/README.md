@@ -3,7 +3,7 @@
 There's a few different problems here that I've found when
 investigating [KTOR-5898](https://youtrack.jetbrains.com/issue/KTOR-5898).
 
-## Bug: Declarations marked with `@Serializable` that have a named companion object fail in `serializer(type)` on the JVM
+## Bug: Declarations marked with `@Serializable(with=)` that have a named companion object fail in `serializer(type)` on the JVM
 
 [Example](src/commonTest/kotlin/SealedInterfaceJsonSelectTests.kt)
 
@@ -11,7 +11,7 @@ Related issues:
 
 - [kotlinx.serialization#1291](https://github.com/Kotlin/kotlinx.serialization/issues/1291)
 - [kotlinx.serialization#1207](https://github.com/Kotlin/kotlinx.serialization/issues/1207)
-- [kotlinx.serialization#2163](https://github.com/Kotlin/kotlinx.serialization/issues/2163)
+- [kotlinx.serialization#2163](https://github.com/Kotlin/kotlinx.serialization/issues/2163) 
 
 This one is a little obscure, but boils down to the JVM implementation
 for [kotlinx.serialization.internal.compiledSerializerImpl](https://github.com/Kotlin/kotlinx.serialization/blob/master/core/jvmMain/src/kotlinx/serialization/internal/Platform.kt#L21),
