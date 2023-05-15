@@ -1,9 +1,12 @@
+import io.kotest.assertions.throwables.shouldThrowAnyUnit
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.matchers.types.shouldBeTypeOf
 import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
@@ -33,8 +36,9 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
         }
 
         test("typeInfoOf") {
-            val explicit = shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<SealedInterfaceNamedCompanion>()) }
-                .shouldNotBeNull()
+            val explicit =
+                shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<SealedInterfaceNamedCompanion>()) }
+                    .shouldNotBeNull()
 
             shouldSerialise { decodeFromString(explicit, encoded) }
                 .shouldNotBeNull()
@@ -74,8 +78,9 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
         }
 
         test("typeInfo") {
-            val explicit = shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<SealedInterfaceExplicitObject>()) }
-                .shouldNotBeNull()
+            val explicit =
+                shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<SealedInterfaceExplicitObject>()) }
+                    .shouldNotBeNull()
 
             shouldSerialise { decodeFromString(explicit, encoded) }
                 .shouldNotBeNull()
@@ -93,8 +98,9 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
         }
 
         test("List<>") {
-            val explicit = shouldSerialise { serializersModule.serializer(typeOf<List<SealedInterfaceExplicitObject>>()) }
-                .shouldNotBeNull()
+            val explicit =
+                shouldSerialise { serializersModule.serializer(typeOf<List<SealedInterfaceExplicitObject>>()) }
+                    .shouldNotBeNull()
 
             shouldSerialise { decodeFromString(explicit, "[${encoded}]") }
                 .shouldNotBeNull()
@@ -105,8 +111,9 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
         }
 
         test("typeInfo List<>") {
-            val explicit = shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<List<SealedInterfaceExplicitObject>>()) }
-                .shouldNotBeNull()
+            val explicit =
+                shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<List<SealedInterfaceExplicitObject>>()) }
+                    .shouldNotBeNull()
 
             shouldSerialise { decodeFromString(explicit, "[${encoded}]") }
                 .shouldNotBeNull()
@@ -139,8 +146,9 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
         }
 
         test("typeInfo") {
-            val explicit = shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<InterfaceExplicitObject>()) }
-                .shouldNotBeNull()
+            val explicit =
+                shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<InterfaceExplicitObject>()) }
+                    .shouldNotBeNull()
 
             shouldSerialise { decodeFromString(explicit, encoded) }
                 .shouldNotBeNull()
@@ -161,8 +169,9 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
         }
 
         test("typeInfo List<>") {
-            val explicit = shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<List<InterfaceExplicitObject>>()) }
-                .shouldNotBeNull()
+            val explicit =
+                shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<List<InterfaceExplicitObject>>()) }
+                    .shouldNotBeNull()
 
             shouldSerialise { decodeFromString(explicit, "[${encoded}]") }
                 .shouldNotBeNull()
@@ -200,7 +209,12 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
             val nested = shouldSerialise { serializersModule.serializer(typeOf<SimpleNested>()) }
                 .shouldNotBeNull()
 
-            val nestedEncoded = shouldSerialise { encodeToString(nested, SimpleNested(decodeFromString(encoded), decodeFromString("\"Hello, World!\""))) }
+            val nestedEncoded = shouldSerialise {
+                encodeToString(
+                    nested,
+                    SimpleNested(decodeFromString(encoded), decodeFromString("\"Hello, World!\""))
+                )
+            }
                 .shouldNotBeNull()
 
             shouldSerialise { decodeFromString(nested, nestedEncoded) }
@@ -209,19 +223,33 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
         }
     }
 
-    test("List<KClass<*>> serialise") {
-        val klassList = shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<List<KClass<*>>>()) }
+    test("List<Any> serialise") {
+        val list = shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<List<Any>>()) }
             .shouldNotBeNull()
-            .shouldBeInstanceOf<KSerializer<List<KClass<*>>>>()
+            .shouldBeInstanceOf<KSerializer<List<Any>>>()
 
-        shouldSerialise { encodeToString(klassList, listOf(String::class, Int::class)) }
+        shouldSerialise { encodeToString(list, emptyList()) }
     }
 
-    test("List<KClass<*>> deserialise") {
-        val klassList = shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<List<KClass<*>>>()) }
+    test("List<Any> deserialise") {
+        val list = shouldSerialise { serializersModule.serializerForTypeInfo(typeInfo<List<Any>>()) }
             .shouldNotBeNull()
-            .shouldBeInstanceOf<KSerializer<List<KClass<*>>>>()
+            .shouldBeInstanceOf<KSerializer<List<Any>>>()
 
-        shouldSerialise { decodeFromString(klassList, "[]") }
+        shouldSerialise { decodeFromString(list, "[]") }
+    }
+
+    test("Simple Encode Test") {
+        Json.encodeToString(
+            Json.serializersModule.serializerForTypeInfo(typeInfo<List<Any>>()) as KSerializer<List<Any>>,
+            emptyList()
+        ) shouldBe "[]"
+    }
+
+    test("Simple Decode Test") {
+        Json.decodeFromString(
+            Json.serializersModule.serializerForTypeInfo(typeInfo<List<Any>>()) as KSerializer<List<Any>>,
+            "[]"
+        ).shouldBeInstanceOf<JsonArray>() shouldHaveSize 0
     }
 })

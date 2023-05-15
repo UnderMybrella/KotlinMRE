@@ -12,6 +12,9 @@ Related issues:
 - [kotlinx.serialization#1291](https://github.com/Kotlin/kotlinx.serialization/issues/1291)
 - [kotlinx.serialization#1207](https://github.com/Kotlin/kotlinx.serialization/issues/1207)
 - [kotlinx.serialization#2163](https://github.com/Kotlin/kotlinx.serialization/issues/2163) 
+- [kotlinx.serialization#1726](https://github.com/Kotlin/kotlinx.serialization/issues/1726)
+
+Status: Impossible to solve with JVM reflection alone ([kotlinx.serialization#2301](https://github.com/Kotlin/kotlinx.serialization/issues/2301#issuecomment-1545892155))
 
 This one is a little obscure, but boils down to the JVM implementation
 for [kotlinx.serialization.internal.compiledSerializerImpl](https://github.com/Kotlin/kotlinx.serialization/blob/master/core/jvmMain/src/kotlinx/serialization/internal/Platform.kt#L21),
@@ -38,6 +41,17 @@ will fail, and give an unhelpful error message, such as:
 - `kotlinx.serialization.SerializationException: Class 'ArrayList' is not registered for polymorphic serialization in the scope of 'List'.`
 - `kotlinx.serialization.json.internal.JsonDecodingException: Expected class kotlinx.serialization.json.JsonObject as the serialized body of kotlinx.serialization.Polymorphic<List>, but had class kotlinx.serialization.json.JsonArray`
 
-(Produced by calling `serializerForTypeInfo(typeInfo<List<KClass<*>>>())`)
+Produced by calling `serializerForTypeInfo(typeInfo<List<Any>())`:
+```kotlin
+Json.encodeToString(
+    Json.serializersModule.serializerForTypeInfo(typeInfo<List<Any>>()) as KSerializer<List<Any>>,
+    emptyList()
+)
+
+Json.decodeFromString(
+    Json.serializersModule.serializerForTypeInfo(typeInfo<List<Any>>()) as KSerializer<List<Any>>,
+    "[]"
+)
+```
 
 While this is ultimately caused by the inner type failing to produce a valid serializer, the error message makes it incredibly difficult to figure out what is actually causing the problem.
