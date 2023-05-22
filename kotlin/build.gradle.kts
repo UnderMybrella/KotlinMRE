@@ -6,13 +6,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization")
 }
 
 group = "dev.brella"
 version = "1.0.0"
-
-val serializationVersion = System.getenv("SERIALIZATION_VERSION") ?: "1.5.1"
 
 repositories {
     mavenCentral()
@@ -24,8 +21,13 @@ kotlin {
         withJava()
     }
     js(IR) {
-        browser()
-        nodejs()
+        browser {
+            commonWebpackConfig {
+                cssSupport {
+                    enabled.set(true)
+                }
+            }
+        }
     }
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
@@ -48,10 +50,6 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                arrayOf("json", "protobuf", "cbor", "properties").forEach {
-                    api("org.jetbrains.kotlinx:kotlinx-serialization-$it:$serializationVersion")
-                }
-
                 api(kotlin("reflect"))
                 api("io.kotest:kotest-framework-engine:5.6.2")
                 api("io.kotest:kotest-assertions-core:5.6.2")
@@ -60,7 +58,6 @@ kotlin {
         val commonTest by getting
         val jvmMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-hocon:$serializationVersion")
                 api("io.kotest:kotest-runner-junit5:5.6.2")
             }
         }

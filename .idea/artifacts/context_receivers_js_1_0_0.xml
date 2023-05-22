@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="context-receivers-js-1.0.0">
+    <output-path>$PROJECT_DIR$/kotlin/context-receivers/build/libs</output-path>
+    <root id="archive" name="context-receivers-js-1.0.0.jar">
+      <element id="module-output" name="KotlinMRE.kotlin.context-receivers.jsMain" />
+    </root>
+  </artifact>
+</component>

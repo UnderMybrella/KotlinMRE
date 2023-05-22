@@ -19,7 +19,9 @@ kotlin {
         withJava()
     }
     js(IR) {
-        nodejs()
+        browser {
+        }
+//        nodejs()
     }
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
@@ -66,8 +68,4 @@ kotlin {
         val nativeMain by getting
         val nativeTest by getting
     }
-}
-
-tasks.withType<Test>().configureEach {
-    useJUnitPlatform()
 }

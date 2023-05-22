@@ -1,0 +1,59 @@
+name: gradle_push
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  run_tests:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        kotlin: [ 1.8.10, 1.8.20, 1.8.21 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
+      - name: Platform = ${{ matrix.os }}, Kotlin = ${{ matrix.kotlin }}
+        uses: gradle/gradle-build-action@v2
+        env:
+          KOTLIN_VERSION: ${{ matrix.kotlin }}
+        with:
+          gradle-executable: gradlew
+          arguments: zipBinaryResults --stacktrace --no-daemon --continue
+      - name: Upload Binary Results
+        uses: actions/upload-artifact@v3
+        with:
+          path: build/binaryResults/*.zip
+  build_report:
+    runs-on: ubuntu-latest
+    needs: run_tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
+      - name: Download Results
+        uses: actions/download-artifact@v3
+        with:
+          path: build/binaryResults
+      - name: Build Report
+        uses: gradle/gradle-build-action@v2
+        env:
+          KOTLIN_VERSION: ${{ matrix.kotlin }}
+        with:
+          gradle-executable: gradlew
+          arguments: zipBinaryResults --stacktrace --no-daemon --continue
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build/groupReport

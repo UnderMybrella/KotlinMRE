@@ -1,9 +1,11 @@
 import io.kotest.assertions.throwables.shouldThrowAnyUnit
+import io.kotest.engine.test.names.appendTagsInDisplayName
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.matchers.types.shouldBeTypeOf
+import io.kotest.mpp.env
 import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -11,10 +13,13 @@ import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
 @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
-class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
+class SealedInterfaceJsonSelectTests : JsonFlatSpec(body = {
+    println("Loading in!")
     val encoded = Json.encodeToString(SealedInterfaceNamedCompanion.StringType("StringType", 0, "Hello, World!"))
 
-    context("SealedInterfaceJsonSelect") {
+    assertSoftly = true
+
+    context("SealedInterfaceJsonSelect", {}) {
         test("reified") {
             val reified = shouldSerialise { serializersModule.serializer<SealedInterfaceNamedCompanion>() }
                 .shouldNotBeNull()
@@ -56,7 +61,7 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
         }
     }
 
-    context("SealedInterfaceExplicitObject") {
+    context("SealedInterfaceExplicitObject", {}) {
         test("reified") {
             val reified = shouldSerialise { serializersModule.serializer<SealedInterfaceExplicitObject>() }
                 .shouldNotBeNull()
@@ -124,7 +129,7 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
         }
     }
 
-    context("InterfaceExplicitObject") {
+    context("InterfaceExplicitObject", {}) {
         test("reified") {
             val reified = shouldSerialise { serializersModule.serializer<InterfaceExplicitObject>() }
                 .shouldNotBeNull()
@@ -182,7 +187,7 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
         }
     }
 
-    context("SimpleNamedCompanion") {
+    context("SimpleNamedCompanion", {}) {
         test("reified") {
             val simple = shouldSerialise { serializersModule.serializer<SimpleNamedCompanion>() }
                 .shouldNotBeNull()
@@ -204,7 +209,7 @@ class SealedInterfaceJsonSelectTests : JsonFunSpec(body = {
         }
     }
 
-    context("SimpleNested") {
+    context("SimpleNested", {}) {
         test("explicit") {
             val nested = shouldSerialise { serializersModule.serializer(typeOf<SimpleNested>()) }
                 .shouldNotBeNull()
